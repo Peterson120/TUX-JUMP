@@ -1,0 +1,5 @@
+#BlueJ class context
+comment0.target=Rectangle
+comment1.params=width\ height\ transparency\ color\ fill
+comment1.target=Rectangle(int,\ int,\ int,\ greenfoot.Color,\ boolean)
+numComments=2

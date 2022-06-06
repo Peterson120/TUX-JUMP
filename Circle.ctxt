@@ -1,0 +1,10 @@
+#BlueJ class context
+comment0.target=Circle
+comment0.text=\n\ Write\ a\ description\ of\ class\ Circle\ here.\n\ \n\ @author\ (your\ name)\ \n\ @version\ (a\ version\ number\ or\ a\ date)\n
+comment1.params=
+comment1.target=Circle()
+comment2.params=diameter\ transparency\ color\ fill
+comment2.target=Circle(int,\ int,\ greenfoot.Color,\ boolean)
+comment3.params=
+comment3.target=greenfoot.GreenfootImage\ getCircle()
+numComments=4
