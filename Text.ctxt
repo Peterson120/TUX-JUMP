@@ -1,0 +1,18 @@
+#BlueJ class context
+comment0.target=Text
+comment0.text=\n\ Add\ a\ Text\ box\ to\ the\ world\n\ Choose\ between\ no\ background,\ different\ colors\ and\ font\ sizes\n
+comment1.params=str\ color\ background\ height
+comment1.target=Text(java.lang.String,\ greenfoot.Color,\ greenfoot.Color,\ int)
+comment2.params=str\ color\ height
+comment2.target=Text(java.lang.String,\ greenfoot.Color,\ int)
+comment3.params=str\ font\ color\ height
+comment3.target=Text(java.lang.String,\ java.lang.String,\ greenfoot.Color,\ int)
+comment4.params=str\ font\ color\ background\ height
+comment4.target=Text(java.lang.String,\ java.lang.String,\ greenfoot.Color,\ greenfoot.Color,\ int)
+comment5.params=str
+comment5.target=void\ updateText(java.lang.String)
+comment6.params=color
+comment6.target=void\ changeColor(greenfoot.Color)
+comment7.params=
+comment7.target=int\ getHeight()
+numComments=8

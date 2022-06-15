@@ -1,8 +1,16 @@
 #BlueJ class context
 comment0.target=JumpWorld
-comment0.text=\n\ Add\ Music\n\ @author\ (your\ name)\ \n\ @version\ (a\ version\ number\ or\ a\ date)\n
+comment0.text=\n\ Add\ Music\ and\ SFX\ with\ M\ as\ mute\ key\n\ Better\ Backgrounds\ and\ color\ schemed\ platforms\n\ Cheats\ are\ in\ NUMS\ class\ under\ the\ space\n\ Cool\ Stuff\ happens\ when\ you\ reach\ 5000\ score\n\ \n\ Images\ Used\:\n\ https\://imgflip.com/memegenerator/Nuclear-Explosion\n
 comment1.params=
 comment1.target=JumpWorld()
-comment2.params=start\ range
-comment2.target=int\ random(int,\ int)
-numComments=3
+comment2.params=
+comment2.target=void\ act()
+comment3.params=color
+comment3.target=void\ setBackground(greenfoot.Color)
+comment4.params=last
+comment4.target=Platform\ createPlatforms(Platform)
+comment5.params=x\ y
+comment5.target=Platform\ createPlatforms(int,\ int)
+comment6.params=range\ start
+comment6.target=int\ random(int,\ int)
+numComments=7
