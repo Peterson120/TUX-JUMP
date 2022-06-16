@@ -2,8 +2,6 @@ import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 
 /**
  * Retro Themed End Screen
- * @author (your name) 
- * @version (a version number or a date)
  */
 public class EndScreen extends World
 {
@@ -12,9 +10,11 @@ public class EndScreen extends World
                             new Text(Integer.toString(NUMS.SCORE), Color.WHITE, 70),
                             new Text("Press Space to Play Again", Color.BLUE, 40)};
     private int[] finalPos = new int[4];        // Positions are relative to last position
+    private Music bm;
     private boolean set = false, added[] = new boolean[4];
     private int act = 0;
     private String typed = "";   // Hidden feature where you can type 'space' to start the game
+    
     public EndScreen() {
         super(NUMS.WORLD_WIDTH, NUMS.WORLD_HEIGHT, 1);
         removeObjects(getObjects(null));
@@ -28,12 +28,29 @@ public class EndScreen extends World
         finalPos[2] = finalPos[1] - txt[1].getHeight();
         finalPos[0] = finalPos[3] - (getHeight() >> 2);
         
+        bm = new Music(new GreenfootSound("DuckTalesMoonTheme.mp3"));
+        
         addObject(txt[3], getWidth() >> 1, 0);
         added[3] = true;
     }
     
-    public void act() {     // Maybe slide text into place    
-        if (!set) {
+    public void act() {     // Maybe slide text into place 
+        bm.loop();
+        bm.play();
+        if (Greenfoot.isKeyDown("m"))
+            NUMS.MUSIC = !NUMS.MUSIC;
+            
+        // Check for user input
+        String key = Greenfoot.getKey();
+        if (key != null && key.matches("[space]+"))
+            typed += key;
+        else if (key != null)
+            typed = "";
+        if (Greenfoot.isKeyDown("enter") || Greenfoot.isKeyDown("space") || typed.toLowerCase().equals("space")) {
+            bm.stop();
+            Greenfoot.setWorld(new JumpWorld());
+        }
+        if (!set) { // Set text slide from top
             if (txt[3].getY() >= finalPos[2] && !added[2]) {
                 addObject(txt[2], getWidth() >> 1, 0);
                 added[2] = true;
@@ -57,17 +74,7 @@ public class EndScreen extends World
             if (act % 30 == 0)  // Blink effect
                 removeObject(txt[3]);
             else if (act % 30 == 10)
-                addObject(txt[3], getWidth() >> 1, getHeight() * 3 >> 2);
-                
-            String key = Greenfoot.getKey();
-            if (key != null && key.matches("[space]+"))
-                typed += key;
-            else if (key != null)
-                typed = "";
-    
-            if (Greenfoot.isKeyDown("enter") || Greenfoot.isKeyDown("space") || typed.toLowerCase().equals("space"))
-                Greenfoot.setWorld(new JumpWorld());
-                
+                addObject(txt[3], getWidth() >> 1, getHeight() * 3 >> 2);   
             act++;
         }
     }

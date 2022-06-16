@@ -1,0 +1,21 @@
+#BlueJ class context
+comment0.target=Music
+comment1.params=file
+comment1.target=Music(greenfoot.GreenfootSound)
+comment2.params=file\ multiplay
+comment2.target=Music(greenfoot.GreenfootSound,\ boolean)
+comment3.params=
+comment3.target=void\ loop()
+comment4.params=
+comment4.target=void\ play()
+comment5.params=level
+comment5.target=void\ play(int)
+comment6.params=
+comment6.target=void\ pause()
+comment7.params=
+comment7.target=void\ stop()
+comment8.params=allow
+comment8.target=void\ multiPlay(boolean)
+comment9.params=
+comment9.target=void\ multiPlay()
+numComments=10

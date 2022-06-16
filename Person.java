@@ -1,6 +1,7 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 import java.util.List;
-// Add Jump noise Animate person
+
+// Change image
 public class Person extends Actor {
     /*
      * Final varibles for the character
@@ -12,11 +13,22 @@ public class Person extends Actor {
      * act keps track of the act number
        */
     private final int sideBuffer = (getImage().getWidth() >> 1) - 6, mouseBuffer = 4, velocity = -15, horizontalSpeed = 7, gravity = NUMS.FLIGHT ? 0 : 1;
-    private int act = 0;                                                                    // Act number
-    private double rate = velocity - 6;                                                     // Fall velocity of the Human (Vertical movement modifier)
-    private boolean down = false, mouseOn = false, lastMouseState = false, stopped = false; // Mouse states and if character is falling down
+    private int act = 0;                                                    // Act number
+    private double rate;                                                    // Fall velocity of the Human (Vertical movement modifier)
+    private boolean down, mouseOn, lastMouseState, stopped;                 // Mouse states and if character is falling down
     private MouseInfo mouse;
+    private Music fx;
+    
+    public Person() { // Setup
+        mouseOn = false;
+        down = false;
+        lastMouseState = false;
+        stopped = false;
+        rate = velocity - 6;
+    }
+    
     public void act() {
+        fx = new Music(new GreenfootSound("BoingFX.mp3"), true);
         mouse = Greenfoot.getMouseInfo();
         int hMove = 0; // Horizontal Movement modifier
         if (Greenfoot.isKeyDown("left") || Greenfoot.isKeyDown("a")) {          // Check if user is pressing the left arrow key or "a"
@@ -52,8 +64,9 @@ public class Person extends Actor {
             if (p == null && act > 1) {     // If no object was detected for collision decrease velocity by the world gravity
                 rate += gravity;
                 act = 0;
-            } else if (down && p != null) { // If person is currently falling downwards and object is detected, reset the velocity to the predetermined velocity
+            } else if (p != null) {         // If person is currently falling downwards and object is detected, reset the velocity to the predetermined velocity
                 rate = velocity;
+                fx.play(100);
                 p.decreaseJumps();
             }
             act++;
@@ -72,13 +85,12 @@ public class Person extends Actor {
     
     private Platform collision() {  // Check platform collision
         Platform plat = null;
-        for (int i = 0; i < rate + NUMS.PLATFORM_HEIGHT && plat == null; i++) {
+        for (int i = 0; i < rate + NUMS.PLATFORM_HEIGHT && plat == null; i++)
             plat = (Platform) getOneObjectAtOffset(0, i, Platform.class);  // Check for plat
-            if (plat != null && !plat.isJumpable())
-                plat = null;
-        }
-        if (plat != null)
+        if (plat != null) {
             setLocation(getX(), plat.getY() - plat.getHeight());
+            fx.play(100);
+        }
         return plat;
     }
     

@@ -1,12 +1,22 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 /**
- * Add Music and SFX with M as mute key
- * Better Backgrounds and color schemed platforms
+ * Add more features
+ * Add Welcome Screen
+ * Add Super Jumps
+ * Change Music
+ * Whoosh sound fx
+ * 
  * Cheats are in NUMS class under the space
  * Cool Stuff happens when you reach 5000 score
+ *  - Change NUMS.SCORE to 5000
+ * Glitch where Person does not always have sound effect
  * 
- * Images Used:
- * https://imgflip.com/memegenerator/Nuclear-Explosion
+ * Edited means I made some changes to the file/audio
+ * Music Used
+ *  - Duck Tales NES Moon Theme https://www.youtube.com/watch?v=KF32DRg9opA
+ *  - Boing Sound Effect        https://www.youtube.com/watch?v=CIuSMI2-l58
+ *  - Edited Chip Crack Effect  https://www.youtube.com/watch?v=vE_n4Xr9qo0
+ *  
  */
 public class JumpWorld extends World {
     public static int movedAmount = 0;
@@ -14,10 +24,11 @@ public class JumpWorld extends World {
     private final static int spawn_buffer = 50, removalRate = 20;
     private int act;
     private double last;
-    private Text score;
+    private Text score, info;
     private Person mainCharacter;
     private GreenfootImage image;
     private BackgroundColor bc;
+    private Music fx, bm;
     
     class BackgroundColor { // Color Picker
         private int R, G, B, amount;
@@ -63,36 +74,58 @@ public class JumpWorld extends World {
         super(NUMS.WORLD_WIDTH, NUMS.WORLD_HEIGHT, 1, false); // World setup
         Greenfoot.setSpeed(50);
         gameEnd = false;
-        NUMS.SCORE = 0;
+        NUMS.SCORE = NUMS.SCORE == 5000 ? 5000 : 0;
         if (NUMS.MORE_PLATFORMS)
-            NUMS.PLATFORMS = 100;
-        else
-            NUMS.PLATFORMS = 20;
+            NUMS.SPACING = 1;
+        if (NUMS.SCORE < 5000) // Check score and set color
+            NUMS.COLOR_SCHEME = NUMS.SCORE_COLOR;
         last = 0;
         act = 0;
         
-        score = new Text("Score: 0", "Open Sans", NUMS.SCORE_COLOR, NUMS.SCOREBAR_HEIGHT * 3 >> 2);
+        score = new Text("Score: " + NUMS.SCORE, "Open Sans", NUMS.SCORE_COLOR, NUMS.SCOREBAR_HEIGHT * 3 >> 2);
+        info = new Text("Use the arrow keys to move around", Color.BLACK, 40);
         mainCharacter = new Person();
         image = new GreenfootImage(NUMS.WORLD_WIDTH, NUMS.WORLD_HEIGHT);
+        fx = new Music(new GreenfootSound("WhooshSoundFX.mp3"));
+        bm = new Music(new GreenfootSound("AmongUsThemeSong.mp3"));
+        bm.loop();
         bc = new BackgroundColor();
         setBackground(bc.getColor());
         
-        Platform plat = createPlatforms(NUMS.WORLD_WIDTH >> 1, 200);
-        while (NUMS.PLATFORMS-- > 0)    // Create random platforms based on initial plat and spacing
+        boolean last = NUMS.EXPLODE, last2 = NUMS.INFINITE_JUMPS; // Store current value
+        NUMS.EXPLODE = false;
+        NUMS.INFINITE_JUMPS = true;
+        Platform plat = createPlatforms(NUMS.WORLD_WIDTH >> 1, NUMS.WORLD_HEIGHT - 300);
+        NUMS.INFINITE_JUMPS = last2;
+        while (plat.getY() >= 0)    // Create random platforms based on initial plat and spacing
             plat = createPlatforms(plat);
+        NUMS.EXPLODE = last;
+        addObject(info, getWidth() >> 1, getHeight() >> 2);
         addObject(mainCharacter, NUMS.WORLD_WIDTH >> 1, NUMS.WORLD_HEIGHT - 50);
         addObject(score, getWidth() - (score.getImage().getWidth() >> 1) - 10, NUMS.SCOREBAR_HEIGHT >> 1);
     }
     
-    public void act() {        // Add Black flashing to White after score is 5000
-        if (NUMS.SCORE > 5000) {
+    public void act() {
+        bm.play();
+        if (Greenfoot.isKeyDown("m"))
+            NUMS.MUSIC = !NUMS.MUSIC;
+        
+        if (NUMS.SCORE >= 10000) {
+            NUMS.EXPLODE = true;
+        } else if (NUMS.SCORE >= 7000) {
+            NUMS.INFINITE_JUMPS = false;
+        } else if (NUMS.SCORE >= 5000) {
             NUMS.COLOR_SCHEME = Color.BLACK;
-            NUMS.INFINITE_JUMPS = true;
-            if (act % 120 == 0) {
+            NUMS.INFINITE_JUMPS = true;     // Use cheats to make game more playable
+            NUMS.EXPLODE = false;
+        } else if (NUMS.SCORE > 50)
+            removeObject(info);
+        
+        if (NUMS.SCORE >= 5000) {            
+            if (act % 120 == 0) // Flicker
                 setBackground(Color.BLACK);
-            } else if (act % 120 == 90) {
+            else if (act % 120 == 90)
                 setBackground(Color.WHITE);
-            }
             act++;
         } else if (NUMS.SCORE / 13 > last) {   // Color change every score increase of 50
             setBackground(bc.nextColor());
@@ -104,16 +137,22 @@ public class JumpWorld extends World {
             if (NUMS.SPACING < (15 * 15 >> 2))                      // Displacement formula with acceleration
                 NUMS.SPACING+=5;                                    // Increase Platform spacing
             movedAmount = 0;                                        // Reset
-            createPlatforms(random(NUMS.WORLD_WIDTH - NUMS.PLATFORM_WIDTH, NUMS.PLATFORM_WIDTH >> 1), NUMS.SCOREBAR_HEIGHT); // Make new platforms
+            createPlatforms(random(NUMS.WORLD_WIDTH - NUMS.PLATFORM_WIDTH - (NUMS.PLATFORM_WIDTH >> 1), NUMS.PLATFORM_WIDTH >> 1), NUMS.SCOREBAR_HEIGHT); // Make new platforms
             
             // Put character in front
             int x = mainCharacter.getX(), y = mainCharacter.getY();
             removeObject(mainCharacter);
             addObject(mainCharacter, x, y);
+            if (NUMS.SCORE < 50) {  // Put info in front of newly spawned platforms
+                removeObject(info);
+                addObject(info, getWidth() >> 1, getHeight() >> 2);
+            }
         }
         
         java.util.List<Platform> plats = getObjects(Platform.class);
         if ((mainCharacter.getY() > NUMS.WORLD_HEIGHT || gameEnd) && plats.size() > 0) {   // Check if character has fallen under the world
+            bm.stop();
+            fx.play();
             gameEnd = true;
             mainCharacter.setStop();    // Stop person from moving
             mainCharacter.setLocation(mainCharacter.getX(), NUMS.WORLD_HEIGHT - (mainCharacter.getHeight() >> 1));
@@ -123,9 +162,11 @@ public class JumpWorld extends World {
                 if (plat.getY() < NUMS.SCOREBAR_HEIGHT)
                     plat.remove();
             }   
-        } else if (plats.size() == 0)
+        } else if (plats.size() == 0) {
+            fx.stop();
+            bm.stop();
             Greenfoot.setWorld(new EndScreen());
-        else 
+        } else 
             gameEnd = false;
             
         // Remove all platforms that are outside of the world after scrolling
@@ -143,7 +184,7 @@ public class JumpWorld extends World {
     }
     
     private Platform createPlatforms(Platform last) {   // Create round platforms everywhere on the screen Randomized x locations
-        return createPlatforms(random(NUMS.WORLD_WIDTH - NUMS.PLATFORM_WIDTH, last.getWidth() >> 1), random(50, NUMS.SPACING) + last.getY());
+        return createPlatforms(random(NUMS.WORLD_WIDTH - NUMS.PLATFORM_WIDTH, last.getWidth() >> 1), last.getY() - random(50, NUMS.SPACING));
     }
     
     private Platform createPlatforms(int x, int y) { // Create a rounded platform at (x,y)

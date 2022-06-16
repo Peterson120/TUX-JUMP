@@ -1,22 +1,15 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 public class Platform extends Actor {
-    private boolean moving, timed, jumpable;                        // Boolean to see if the platform should move, if the platform is on a timer, and if the platform is destroyed
+    private boolean moving, timed;                        // Boolean to see if the platform should move, if the platform is on a timer, and if the platform is destroyed
     private int leftBarrier, moveAmount, speed, jumpsLeft, timer;   // Determine platform spacing, amount to move, and left barrier and number of jumps left on the platform
     private GreenfootImage image;
+    private Music fx;
     
     public Platform(int left) { // Set image to a rectangle and add it
-        image = new GreenfootImage(NUMS.PLATFORM_WIDTH + NUMS.PLATFORM_HEIGHT, NUMS.PLATFORM_HEIGHT); // Draw Image
-        image.setColor(NUMS.COLOR_SCHEME);
-        image.setTransparency(NUMS.MAX_TRANSPARENCY);
-        image.fillRect(NUMS.PLATFORM_HEIGHT >> 1, 0, NUMS.PLATFORM_WIDTH, NUMS.PLATFORM_HEIGHT);
-        image.fillOval(0, 0, NUMS.PLATFORM_HEIGHT, NUMS.PLATFORM_HEIGHT);
-        image.fillOval(NUMS.PLATFORM_WIDTH, 0, NUMS.PLATFORM_HEIGHT, NUMS.PLATFORM_HEIGHT);
-        setImage(image);
-        
-        jumpable = true;
+        changeColor(NUMS.COLOR_SCHEME);
         moving = NUMS.SCORE > NUMS.SPAWN_SCORE && random(8, 0) == 0;
         if (!moving) {    // Moving platforms cannot explode and have near infinite jumps
-            timed = NUMS.EXPLODE ? random(15, 0) == 0 : false;
+            timed = NUMS.EXPLODE ? random(15, 0) == 0 : false;  // Exploding platforms
             jumpsLeft = random(9, 1);
         } else {
             jumpsLeft = -1;
@@ -28,6 +21,7 @@ public class Platform extends Actor {
         moveAmount = random(NUMS.WORLD_WIDTH >> 1, NUMS.PLATFORM_WIDTH * 2);
         timer = 40;
         leftBarrier = left;
+        fx = new Music(new GreenfootSound("CrackingNoiseFX.mp3"), true);
     }
     
     public void act() {
@@ -39,7 +33,8 @@ public class Platform extends Actor {
             if (timer <= 0)
                 remove();
             else if (timer == 20) {
-                explode();
+                changeColor(Color.RED);
+                fx.play(75);
             }
         } else if (moving) {    // If platform is moving
             if (getX() > moveAmount + leftBarrier || getX() > NUMS.WORLD_WIDTH && speed > 0)   // If platform is past right side
@@ -59,13 +54,6 @@ public class Platform extends Actor {
                 setLocation(getX() + amount, getY());
                 break;
         }
-    }
-    
-    private void explode() {    // Create explosion effect
-        GreenfootImage explosion = new GreenfootImage("explosion.jpg");
-        explosion.scale(NUMS.PLATFORM_WIDTH, NUMS.PLATFORM_HEIGHT);
-        setImage(explosion);
-        jumpable = false;
     }
     
     private int random(int range, int start) {  // Get a random number
@@ -98,9 +86,5 @@ public class Platform extends Actor {
     
     public int getWidth() {
         return getImage().getWidth();
-    }
-    
-    public boolean isJumpable() {
-        return jumpable;
     }
 }

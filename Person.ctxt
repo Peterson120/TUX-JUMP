@@ -1,11 +1,13 @@
 #BlueJ class context
 comment0.target=Person
 comment1.params=
-comment1.target=void\ act()
+comment1.target=Person()
 comment2.params=
-comment2.target=Platform\ collision()
+comment2.target=void\ act()
 comment3.params=
-comment3.target=int\ getHeight()
+comment3.target=Platform\ collision()
 comment4.params=
-comment4.target=void\ setStop()
-numComments=5
+comment4.target=int\ getHeight()
+comment5.params=
+comment5.target=void\ setStop()
+numComments=6

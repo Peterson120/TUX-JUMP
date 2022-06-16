@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.target=JumpWorld
-comment0.text=\n\ Add\ Music\ and\ SFX\ with\ M\ as\ mute\ key\n\ Better\ Backgrounds\ and\ color\ schemed\ platforms\n\ Cheats\ are\ in\ NUMS\ class\ under\ the\ space\n\ Cool\ Stuff\ happens\ when\ you\ reach\ 5000\ score\n\ \n\ Images\ Used\:\n\ https\://imgflip.com/memegenerator/Nuclear-Explosion\n
+comment0.text=\n\ Add\ more\ features\n\ Add\ Welcome\ Screen\n\ Add\ Super\ Jumps\n\ Change\ Music\n\ Whoosh\ sound\ fx\n\ \n\ Cheats\ are\ in\ NUMS\ class\ under\ the\ space\n\ Cool\ Stuff\ happens\ when\ you\ reach\ 5000\ score\n\ \ -\ Change\ NUMS.SCORE\ to\ 5000\n\ Glitch\ where\ Person\ does\ not\ always\ have\ sound\ effect\n\ \n\ Edited\ means\ I\ made\ some\ changes\ to\ the\ file/audio\n\ Music\ Used\n\ \ -\ Duck\ Tales\ NES\ Moon\ Theme\ https\://www.youtube.com/watch?v\=KF32DRg9opA\n\ \ -\ Boing\ Sound\ Effect\ \ \ \ \ \ \ \ https\://www.youtube.com/watch?v\=CIuSMI2-l58\n\ \ -\ Edited\ Chip\ Crack\ Effect\ \ https\://www.youtube.com/watch?v\=vE_n4Xr9qo0\n\ \ \n
 comment1.params=
 comment1.target=JumpWorld()
 comment2.params=
