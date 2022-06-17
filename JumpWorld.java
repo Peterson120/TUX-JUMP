@@ -40,7 +40,7 @@ public class JumpWorld extends World {
     private final static int spawn_buffer = 50, removalRate = 20;
     private int act;
     private double last;
-    private boolean lastPress;  // Gets last user keystroke to make sure music is not muted twic
+    private boolean lastPress, infoOn;  // Gets last user keystroke to make sure music is not muted multiple times
     private Text score, info;
     private Person mainCharacter;
     private GreenfootImage image;
@@ -97,6 +97,7 @@ public class JumpWorld extends World {
         super(NUMS.WORLD_WIDTH, NUMS.WORLD_HEIGHT, 1, false); // World setup
         Greenfoot.setSpeed(50);
         gameEnd = false;
+        infoOn = true;
         NUMS.SCORE = 0;
         if (NUMS.START_AT_5000)
             NUMS.SCORE = 5000;
@@ -143,29 +144,29 @@ public class JumpWorld extends World {
         if (Greenfoot.isKeyDown("m") && !lastPress) { // Check if M is pressed and that it was not previously pressed
             NUMS.MUSIC = !NUMS.MUSIC;
             NUMS.SFX = !NUMS.SFX;
-        } else if (Greenfoot.isKeyDown("left") || Greenfoot.isKeyDown("right") || Greenfoot.isKeyDown("a") || Greenfoot.isKeyDown("d")) { // Remove info on key press
+        } else if (infoOn && (Greenfoot.isKeyDown("left") || Greenfoot.isKeyDown("right") || Greenfoot.isKeyDown("a") || Greenfoot.isKeyDown("d"))) { // Remove info on key press
             removeObject(info);
             removeObject(leftKey);
             removeObject(rightKey);
+            infoOn = false;
         }
-        if (NUMS.MUSIC) {
+        if (NUMS.MUSIC)
             bm.play();
-        } else {
+        else
             bm.pause();
-        }
         lastPress = Greenfoot.isKeyDown("m");
         
-        if (NUMS.SCORE >= 10000) {
+        if (NUMS.SCORE >= 10000)        // Remove second cheat
             NUMS.EXPLODE = true;
-        } else if (NUMS.SCORE >= 7000) {
+        else if (NUMS.SCORE >= 7000)    // Remove one cheat
             NUMS.INFINITE_JUMPS = false;
-        } else if (NUMS.SCORE >= 5000) {
+        else if (NUMS.SCORE >= 5000) {
             NUMS.COLOR_SCHEME = Color.BLACK;
             NUMS.INFINITE_JUMPS = true;     // Use cheats to make game more playable
             NUMS.EXPLODE = false;
         }
         
-        if (NUMS.SCORE >= 5000) {            
+        if (NUMS.SCORE >= 5000) { // After score is 5000       
             if (act % 120 == 0) // Flicker
                 setBackground(Color.BLACK);
             else if (act % 120 == 90)
@@ -184,10 +185,8 @@ public class JumpWorld extends World {
             movedAmount = 0;                                        // Reset
             createPlatforms(random(NUMS.WORLD_WIDTH - NUMS.PLATFORM_WIDTH - (NUMS.PLATFORM_WIDTH >> 1), NUMS.PLATFORM_WIDTH >> 1), NUMS.SCOREBAR_HEIGHT); // Make new platforms
             
-            // Put character in front
-            int x = mainCharacter.getX(), y = mainCharacter.getY();
-            removeObject(mainCharacter);
-            addObject(mainCharacter, x, y);
+            // Put Objects in front of new platform
+            replace();
         }
         
         java.util.List<Platform> plats = getObjects(Platform.class);
@@ -215,8 +214,19 @@ public class JumpWorld extends World {
         // Remove all platforms that are outside of the world after scrolling
         plats = getObjects(Platform.class); // Update List
         for (Object i : plats)
-            if (((Platform) i).getY() + NUMS.PLATFORM_HEIGHT > NUMS.WORLD_HEIGHT) // Check if platform is below screen and Remove a little earlier to prevent from jumping when slightly under screen
+            if (((Platform) i).getY() + NUMS.PLATFORM_HEIGHT > NUMS.WORLD_HEIGHT) // Check if platform is below screen
                 removeObject((Actor)i);
+    }
+    
+    public void replace() {
+        Actor[] actors = {mainCharacter, score, music, sfx, leftKey, rightKey, info};
+        for (int i = 0; i < actors.length; i++) {
+            if (i > 3 && !infoOn)
+                return;
+            int x = actors[i].getX(), y = actors[i].getY();
+            removeObject(actors[i]);
+            addObject(actors[i], x, y);
+        }
     }
     
     private void setBackground(Color color) {   // Set Background to a color

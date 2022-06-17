@@ -49,11 +49,10 @@ public class Person extends Actor {
         
         int hMove = 0; // Horizontal Movement modifier
         if (allowMovement) {
-            if (Greenfoot.isKeyDown("left") || Greenfoot.isKeyDown("a")) {          // Check if user is pressing the left arrow key or "a"
+            if (Greenfoot.isKeyDown("left") || Greenfoot.isKeyDown("a"))          // Check if user is pressing the left arrow key or "a"
                 hMove -= horizontalSpeed;     // Decrease horizontal movement variable (to move left)
-            } else if (Greenfoot.isKeyDown("right") || Greenfoot.isKeyDown("d")) {    // Check if user if pressing the right arrow key or "d"
+            else if (Greenfoot.isKeyDown("right") || Greenfoot.isKeyDown("d"))    // Check if user if pressing the right arrow key or "d"
                 hMove += horizontalSpeed;     // Increase horizontal movement variable (to move right)
-            }
         }
         
         // Loop to other side if player is out of world bounds
@@ -88,8 +87,11 @@ public class Person extends Actor {
             if (getY() + (int) Math.round(rate) <= NUMS.THRESHOLD) { // Set character at a position in world if it is past the threshold in the world
                 setLocation(getX(), NUMS.THRESHOLD);
                 int difference = getY() + (int) Math.round(rate) - NUMS.THRESHOLD;
-                for (Platform plats : getWorld().getObjects(Platform.class))
+                for (Platform plats : getWorld().getObjects(Platform.class)) { // Scroll Platforms
                     plats.move(0, difference);
+                    if (plats.getY() + NUMS.PLATFORM_HEIGHT > NUMS.WORLD_HEIGHT) // Check if platform is below screen
+                        getWorld().removeObject(plats);
+                }
                 JumpWorld.movedAmount -= difference;
                 NUMS.SCORE -= (difference >> 3);
             } else

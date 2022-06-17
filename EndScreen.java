@@ -20,14 +20,14 @@ public class EndScreen extends World {
         setBackground(image);
         
         images = new Actor[] {  new TextImages("EndText1.png", "YOU LOSE".length(), 80),
-                                new TextImages("EndText2.png", "YOR SCORE WAS".length(), 40),
-                                new Text(Integer.toString(NUMS.SCORE), Color.WHITE, 70),
+                                new TextImages("EndText2.png", "YOR SCORE WAS".length(), 25),
+                                new Text(Integer.toString(NUMS.SCORE), Color.WHITE, 65),
                                 new TextImages("EndText3.png", "PRESS SPACE TO PLAY AGAIN".length(), 20)};
         
-        finalPos[3] = getHeight() * 3 >> 2;
-        finalPos[1] = finalPos[3] - (getHeight() >> 1);
-        finalPos[2] = finalPos[1] - ((Images) images[1]).getHeight() - 10;
-        finalPos[0] = finalPos[3] - (getHeight() >> 2);
+        finalPos[3] = getHeight() - (((Images) images[3]).getHeight() << 1);
+        finalPos[1] = finalPos[3] - ((getHeight() >> 1) + (((Images) images[1]).getHeight() << 1));
+        finalPos[2] = finalPos[1] - ((Images) images[1]).getHeight() - 30;
+        finalPos[0] = finalPos[3] - (getHeight() >> 3);
         
         mainCharacter = new Person();
         bm = new Music(new GreenfootSound("DuckTalesMoonTheme.mp3"));
@@ -82,7 +82,7 @@ public class EndScreen extends World {
             if (act % 30 == 0)  // Blink effect
                 removeObject(images[3]);
             else if (act % 30 == 10)
-                addObject(images[3], getWidth() >> 1, getHeight() * 3 >> 2);   
+                addObject(images[3], getWidth() >> 1, finalPos[3]);   
         }
         act++;
     }
