@@ -6,48 +6,37 @@ import greenfoot.*;
    */
 public class Text extends Actor {
     private GreenfootImage text;
-    private String str, font;
+    private String str;
     private Color color, background;
-    private int height;
-    public Text(String str, Color color, Color background, int height) {
-        this(str, "Arial", color, background, height);
+    private int size;
+    
+    public Text(String str, Color color, int size) {
+        this(str, color, new Color(0, 0, 0, 0), size);
     }
     
-    public Text(String str, Color color, int height) {
-        this(str, "Arial", color, new Color(0, 0, 0, 0), height);
-    }
-    
-    public Text(String str, String font, Color color, int height) {
-        this(str, "Arial", color, new Color(0, 0, 0, 0), height);
-    }
-    
-    public Text(String str, String font, Color color, Color background, int height) {
+    public Text(String str, Color color, Color background, int size) { // Create a greenfoot TextImage (was not able to centre text in a greenfoot image)
         this.str = str;
         this.color = color;
         this.background = background;
-        this.height = height;
-        this.font = font;
-        text = new GreenfootImage(str, 12, color, background);
-        text.setTransparency(NUMS.MAX_TRANSPARENCY);
-        text.scale((height >> 3) * 3 * str.length(), height);
-        text.setFont(new Font(font, height));
+        this.size = size;
+        text = new GreenfootImage(str, size, color, background);
         setImage(text);
     }
     
     // Used for updating score
     public void updateText(String str) {
         this.str = str;
-        text = new GreenfootImage(str, str.length() * 12, color, background);
-        text.setTransparency(NUMS.MAX_TRANSPARENCY);
-        text.scale((height >> 3) * 3 * str.length(), height);
-        text.setFont(new Font(font, height));
+        text = new GreenfootImage(str, size, color, background);
         setImage(text);
-        setLocation(NUMS.WORLD_WIDTH - (str.length() * 12), getY());
     }
     
     public void changeColor(Color color) {
         this.color = color;
         updateText(str);
+    }
+    
+    public int getWidth() {
+        return getImage().getWidth();
     }
     
     public int getHeight() {

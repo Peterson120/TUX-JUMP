@@ -11,10 +11,12 @@ class NUMS  {   // Class of constants and globals variables
     static greenfoot.Color COLOR_SCHEME = new greenfoot.Color(255, 253, 208);       // Color of the platform
     static int SPACING = 40;                                    // Spacing between Platforms
     static boolean MUSIC = true;                                // Enable music
+    static boolean SFX = true;                                  // Enable Sound effects
     static int SCORE = 0;                                       // Current Score
     
+    static boolean START_AT_5000 = false;                       // Start at score 5000
     static boolean EXPLODE = true;                              // Allow exploding platforms
-    static boolean INFINITE_JUMPS = true;                      // Allow Infinite Jump Platforms
+    static boolean INFINITE_JUMPS = false;                      // Allow Infinite Jump Platforms
     static boolean MORE_PLATFORMS = false;                      // LOTS OF PLATFORMS!!
     static boolean FLIGHT = false;                              // Allow Flight
 }

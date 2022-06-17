@@ -40,17 +40,13 @@ class Music {
     }
     
     void play(int level) {  // Play music at a certain level
-        if (!NUMS.MUSIC)
-            pause();
-        else {
-            if (multiplay) {
-                it++;
-                musics[it%20].setVolume(level);
-                musics[it%20].play();
-            } else {
-                music.setVolume(level);
-                music.play();
-            }
+        if (multiplay) {
+            it++;
+            musics[it%20].setVolume(level);
+            musics[it%20].play();
+        } else {
+            music.setVolume(level);
+            music.play();
         }
     }
     

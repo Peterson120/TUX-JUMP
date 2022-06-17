@@ -1,0 +1,8 @@
+#BlueJ class context
+comment0.target=Images
+comment0.text=\n\ Super\ class\ of\ Left\ and\ Right\ key\ Presses\n
+comment1.params=
+comment1.target=int\ getWidth()
+comment2.params=
+comment2.target=int\ getHeight()
+numComments=3

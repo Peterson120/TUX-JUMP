@@ -5,45 +5,55 @@ import java.util.List;
 public class Person extends Actor {
     /*
      * Final varibles for the character
-     * Mousebuffer allows the mouse to be within a range to prevent the character from glitching between pixels
      * Side buffer is how much the character can be off the left/right side of the screen
      * Velocity is the initial jump speed of the character
      * horizontalSpeed is the speed to move horizontally on mouse movement or arrow key presses
      * Gravity is the Downwards Acceleration
      * act keps track of the act number
        */
-    private final int sideBuffer = (getImage().getWidth() >> 1) - 6, mouseBuffer = 4, velocity = -15, horizontalSpeed = 7, gravity = NUMS.FLIGHT ? 0 : 1;
+    private final int sideBuffer = (getImage().getWidth() >> 2), velocity = -15, horizontalSpeed = 7, gravity = NUMS.FLIGHT ? 0 : 1;
     private int act = 0;                                                    // Act number
     private double rate;                                                    // Fall velocity of the Human (Vertical movement modifier)
-    private boolean down, mouseOn, lastMouseState, stopped;                 // Mouse states and if character is falling down
+    private boolean down, stopped, allowMovement;                           // Mouse states and if character is falling down
+    private GreenfootImage falling, standing;
     private MouseInfo mouse;
     private Music fx;
     
     public Person() { // Setup
-        mouseOn = false;
         down = false;
-        lastMouseState = false;
         stopped = false;
+        allowMovement = true;
         rate = velocity - 6;
+        
+        falling = new GreenfootImage("Sitting.png");
+        falling.scale(60, 72);
+        
+        standing = new GreenfootImage("Standing.png");
+        standing.scale(60, 72);
+        setImage(standing);
+    }
+    
+    public Person(boolean move) {
+        this();
+        allowMovement = move;
     }
     
     public void act() {
-        fx = new Music(new GreenfootSound("BoingFX.mp3"), true);
+        fx = new Music(new GreenfootSound("BoingFX.mp3"), true);    // Reset Sound to allow multiple sounds to play at once
         mouse = Greenfoot.getMouseInfo();
+        
+        if (NUMS.SCORE > 5000) {
+            standing.setColor(Color.BLACK);
+            falling.setColor(Color.BLACK);
+        }
+        
         int hMove = 0; // Horizontal Movement modifier
-        if (Greenfoot.isKeyDown("left") || Greenfoot.isKeyDown("a")) {          // Check if user is pressing the left arrow key or "a"
-            mouseOn = false;              // Disable mouse movement
-            hMove -= horizontalSpeed;     // Decrease horizontal movement variable (to move left)
-        } else if (Greenfoot.isKeyDown("right") || Greenfoot.isKeyDown("d")) {    // Check if user if pressing the right arrow key or "d"
-            mouseOn = false;              // Disable mouse movement
-            hMove += horizontalSpeed;     // Increase horizontal movement variable (to move right)
-        } else if (mouse != null && (lastMouseState = mouse.getButton() == 1) && mouseOn != lastMouseState && mouse.getY() > NUMS.SCOREBAR_HEIGHT) // Set lastMouseState to current mouse state and check if the current mouse state has changed
-            mouseOn = !mouseOn;     // If state has changed then allow user to use mouse to move character
-        else if (mouse != null && mouseOn && mouse.getY() > NUMS.SCOREBAR_HEIGHT) {     // Force user to move at the same speed as using a keyboard so there is no advantage
-            if (getX() + mouseBuffer < mouse.getX())
-                hMove += horizontalSpeed; // Same as keyboard
-            else if (getX() - mouseBuffer > mouse.getX())
-                hMove -= horizontalSpeed; // Same as keyboard
+        if (allowMovement) {
+            if (Greenfoot.isKeyDown("left") || Greenfoot.isKeyDown("a")) {          // Check if user is pressing the left arrow key or "a"
+                hMove -= horizontalSpeed;     // Decrease horizontal movement variable (to move left)
+            } else if (Greenfoot.isKeyDown("right") || Greenfoot.isKeyDown("d")) {    // Check if user if pressing the right arrow key or "d"
+                hMove += horizontalSpeed;     // Increase horizontal movement variable (to move right)
+            }
         }
         
         // Loop to other side if player is out of world bounds
@@ -55,10 +65,13 @@ public class Person extends Actor {
         setLocation(getX() + hMove, getY());
             
         if (!stopped) {             // Do not run if character should not be moving
-            if (down && rate < 0)   // Determine if the character is currently falling
+            if (down && rate < 0) {   // Determine if the character is currently falling
                 down = false;
-            else if (!down && rate > 2) // Ensure that the person does not seem like it is double jumping
+                setImage(standing);
+            } else if (!down && rate > 0) { // Ensure that the person does not seem like it is double jumping
                 down = true;
+                setImage(falling);
+            }
             
             Platform p = down ? collision() : null; // Improve efficiency
             if (p == null && act > 1) {     // If no object was detected for collision decrease velocity by the world gravity
@@ -66,8 +79,9 @@ public class Person extends Actor {
                 act = 0;
             } else if (p != null) {         // If person is currently falling downwards and object is detected, reset the velocity to the predetermined velocity
                 rate = velocity;
-                fx.play(100);
                 p.decreaseJumps();
+                if (NUMS.SFX)
+                    fx.play(100);
             }
             act++;
             
@@ -89,7 +103,8 @@ public class Person extends Actor {
             plat = (Platform) getOneObjectAtOffset(0, i, Platform.class);  // Check for plat
         if (plat != null) {
             setLocation(getX(), plat.getY() - plat.getHeight());
-            fx.play(100);
+            if (NUMS.SFX)
+                fx.play(100);
         }
         return plat;
     }

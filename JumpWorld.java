@@ -1,22 +1,38 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 /**
- * Add more features
- * Add Welcome Screen
  * Add Super Jumps
- * Change Music
- * Whoosh sound fx
+ * Button Click Sound
+ * 
+ * How to Play:
+ * - Click Play to start the game
+ * - Use the Arrow keys or AD to move left and right
+ * - Try to stay on the platforms and get a high score
+ * - Platorms might break so move fast!
+ * - Use 'm' to mute the SFX and music
  * 
  * Cheats are in NUMS class under the space
  * Cool Stuff happens when you reach 5000 score
- *  - Change NUMS.SCORE to 5000
- * Glitch where Person does not always have sound effect
+ *  - Change NUMS.START_AT_5000 to true
  * 
  * Edited means I made some changes to the file/audio
  * Music Used
  *  - Duck Tales NES Moon Theme https://www.youtube.com/watch?v=KF32DRg9opA
+ *  - Super Mario Galaxy        https://www.youtube.com/watch?v=1bvDHAUv2ak
+ *  - Mario Death Sound         https://www.youtube.com/watch?v=k8KB2mhsDTY
  *  - Boing Sound Effect        https://www.youtube.com/watch?v=CIuSMI2-l58
+ *  - Mouse Click               https://www.youtube.com/watch?v=h6_8SlZZwvQ
  *  - Edited Chip Crack Effect  https://www.youtube.com/watch?v=vE_n4Xr9qo0
- *  
+ *  - Edited Mario Oh No        https://www.youtube.com/watch?v=CLsLA0Ph0hE&ab_channel=TimothyWing
+ *  - Edited Mario Kart Wii     https://www.youtube.com/watch?v=iFUxQ4Yv3ns&ab_channel=Totej
+ *
+ * Images Used
+ *  - Edited Penguin Standing   https://www.dreamstime.com/vector-illustration-cute-baby-penguin-cartoon-sitting-isolated-white-background-cute-baby-penguin-cartoon-sitting-image104296247
+ *  - Edited Penguin Sitting    https://www.shutterstock.com/image-vector/vector-illustration-cute-baby-penguin-cartoon-747975076
+ *  - Volume Button             https://www.istockphoto.com/vector/speaker-audio-icon-set-volume-voice-control-on-off-mute-symbol-flat-application-gm1276641059-376092875
+ *  - Music Mute Button         https://www.nicepng.com/ourpic/u2e6w7r5e6t4r5t4_muted-music-notes-music-mute-icon-png/
+ *  - Music Button              https://www.vectorstock.com/royalty-free-vector/music-button-on-white-vector-10514828
+ *  - Play Button               http://clipart-library.com/clipart/8TzrapBXc.htm
+ *  - Background                https://websitebackgroundmaker.com/backgrounds/gradients/
  */
 public class JumpWorld extends World {
     public static int movedAmount = 0;
@@ -24,11 +40,14 @@ public class JumpWorld extends World {
     private final static int spawn_buffer = 50, removalRate = 20;
     private int act;
     private double last;
+    private boolean lastPress;  // Gets last user keystroke to make sure music is not muted twic
     private Text score, info;
     private Person mainCharacter;
     private GreenfootImage image;
+    private Images leftKey, rightKey;
     private BackgroundColor bc;
     private Music fx, bm;
+    private Button sfx, music;
     
     class BackgroundColor { // Color Picker
         private int R, G, B, amount;
@@ -36,9 +55,9 @@ public class JumpWorld extends World {
         
         BackgroundColor() { // Initial Values
             up = true;
-            R = 0;
-            G = 255;
-            B = 255;
+            R = 137;
+            G = 207;
+            B = 240;
             amount = NUMS.WORLD_HEIGHT / 255 + 5;
         }
         
@@ -50,11 +69,15 @@ public class JumpWorld extends World {
             if (R == 255 && NUMS.SCORE >= 4000)
                 up = false;
             if (up && G > 0 && R < 255) {
-                R++;
-                G--;
+                if (R < 255)
+                    R++;
+                if (G > 0)
+                    G--;
             } else if(R > 0 && B > 0) {
-                R--;
-                B--;
+                if (R > 0)
+                    R--;
+                if (B > 0)
+                    B--;
             }
             return new Color(R, G, B);
         }
@@ -74,7 +97,9 @@ public class JumpWorld extends World {
         super(NUMS.WORLD_WIDTH, NUMS.WORLD_HEIGHT, 1, false); // World setup
         Greenfoot.setSpeed(50);
         gameEnd = false;
-        NUMS.SCORE = NUMS.SCORE == 5000 ? 5000 : 0;
+        NUMS.SCORE = 0;
+        if (NUMS.START_AT_5000)
+            NUMS.SCORE = 5000;
         if (NUMS.MORE_PLATFORMS)
             NUMS.SPACING = 1;
         if (NUMS.SCORE < 5000) // Check score and set color
@@ -82,12 +107,17 @@ public class JumpWorld extends World {
         last = 0;
         act = 0;
         
-        score = new Text("Score: " + NUMS.SCORE, "Open Sans", NUMS.SCORE_COLOR, NUMS.SCOREBAR_HEIGHT * 3 >> 2);
-        info = new Text("Use the arrow keys to move around", Color.BLACK, 40);
+        // Create Objects
+        score = new Text("Score: " + NUMS.SCORE, NUMS.SCORE_COLOR, NUMS.SCOREBAR_HEIGHT * 3 >> 2);
+        info = new Text("Use the arrow keys to move around", Color.BLACK, 30);
+        leftKey = new LeftKey();
+        rightKey = new RightKey();
         mainCharacter = new Person();
         image = new GreenfootImage(NUMS.WORLD_WIDTH, NUMS.WORLD_HEIGHT);
-        fx = new Music(new GreenfootSound("WhooshSoundFX.mp3"));
-        bm = new Music(new GreenfootSound("AmongUsThemeSong.mp3"));
+        fx = new Music(new GreenfootSound("SuperMarioBrosFX.mp3"));
+        bm = new Music(new GreenfootSound("SuperMarioGalaxySoundtrack.mp3"));
+        sfx = new Button("SFX");
+        music = new Button("Music");
         bm.loop();
         bc = new BackgroundColor();
         setBackground(bc.getColor());
@@ -102,13 +132,28 @@ public class JumpWorld extends World {
         NUMS.EXPLODE = last;
         addObject(info, getWidth() >> 1, getHeight() >> 2);
         addObject(mainCharacter, NUMS.WORLD_WIDTH >> 1, NUMS.WORLD_HEIGHT - 50);
-        addObject(score, getWidth() - (score.getImage().getWidth() >> 1) - 10, NUMS.SCOREBAR_HEIGHT >> 1);
+        addObject(score, getWidth() - (score.getWidth() >> 1) - 10, NUMS.SCOREBAR_HEIGHT >> 1);
+        addObject(music, (music.getWidth() >> 1) + 10, (music.getHeight() >> 1) + 10);
+        addObject(sfx, music.getX() + music.getWidth() + 20, music.getY());
+        addObject(leftKey, info.getX() - 25, info.getY() + (leftKey.getHeight() >> 1) + (info.getHeight() >> 1));
+        addObject(rightKey, leftKey.getX() + (leftKey.getWidth() >> 1), leftKey.getY());
     }
     
     public void act() {
-        bm.play();
-        if (Greenfoot.isKeyDown("m"))
+        if (Greenfoot.isKeyDown("m") && !lastPress) { // Check if M is pressed and that it was not previously pressed
             NUMS.MUSIC = !NUMS.MUSIC;
+            NUMS.SFX = !NUMS.SFX;
+        } else if (Greenfoot.isKeyDown("left") || Greenfoot.isKeyDown("right") || Greenfoot.isKeyDown("a") || Greenfoot.isKeyDown("d")) { // Remove info on key press
+            removeObject(info);
+            removeObject(leftKey);
+            removeObject(rightKey);
+        }
+        if (NUMS.MUSIC) {
+            bm.play();
+        } else {
+            bm.pause();
+        }
+        lastPress = Greenfoot.isKeyDown("m");
         
         if (NUMS.SCORE >= 10000) {
             NUMS.EXPLODE = true;
@@ -118,8 +163,7 @@ public class JumpWorld extends World {
             NUMS.COLOR_SCHEME = Color.BLACK;
             NUMS.INFINITE_JUMPS = true;     // Use cheats to make game more playable
             NUMS.EXPLODE = false;
-        } else if (NUMS.SCORE > 50)
-            removeObject(info);
+        }
         
         if (NUMS.SCORE >= 5000) {            
             if (act % 120 == 0) // Flicker
@@ -133,6 +177,7 @@ public class JumpWorld extends World {
         }
     
         score.updateText("Score: " + NUMS.SCORE);
+        score.setLocation(NUMS.WORLD_WIDTH - (score.getWidth() >> 1) - 10, score.getY());
         if (movedAmount > NUMS.SPACING || NUMS.MORE_PLATFORMS) {    // Check is the platforms have moved down more than the max spacing
             if (NUMS.SPACING < (15 * 15 >> 2))                      // Displacement formula with acceleration
                 NUMS.SPACING+=5;                                    // Increase Platform spacing
@@ -143,29 +188,27 @@ public class JumpWorld extends World {
             int x = mainCharacter.getX(), y = mainCharacter.getY();
             removeObject(mainCharacter);
             addObject(mainCharacter, x, y);
-            if (NUMS.SCORE < 50) {  // Put info in front of newly spawned platforms
-                removeObject(info);
-                addObject(info, getWidth() >> 1, getHeight() >> 2);
-            }
         }
         
         java.util.List<Platform> plats = getObjects(Platform.class);
         if ((mainCharacter.getY() > NUMS.WORLD_HEIGHT || gameEnd) && plats.size() > 0) {   // Check if character has fallen under the world
             bm.stop();
-            fx.play();
+            if (NUMS.SFX)
+                fx.play();
             gameEnd = true;
             mainCharacter.setStop();    // Stop person from moving
             mainCharacter.setLocation(mainCharacter.getX(), NUMS.WORLD_HEIGHT - (mainCharacter.getHeight() >> 1));
             setBackground(bc.transition());
+            removeObject(leftKey);
+            removeObject(rightKey);
             for (Platform plat : plats) { // Move all platforms up at removal speed
                 plat.move(0, removalRate);
                 if (plat.getY() < NUMS.SCOREBAR_HEIGHT)
                     plat.remove();
             }   
         } else if (plats.size() == 0) {
-            fx.stop();
             bm.stop();
-            Greenfoot.setWorld(new EndScreen());
+            Greenfoot.setWorld(new EndScreen(mainCharacter.getX()));
         } else 
             gameEnd = false;
             
@@ -193,7 +236,7 @@ public class JumpWorld extends World {
         return plat;
     }
     
-    private int random(int range, int start) {
+    private int random(int range, int start) {  // RNG
         java.security.SecureRandom sr = new java.security.SecureRandom();
         int num = sr.nextInt(range) + start;
         return num; 

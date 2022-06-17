@@ -1,21 +1,17 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
-
 /**
  * Retro Themed End Screen
  */
-public class EndScreen extends World
-{
-    private Text[] txt =   {new Text("YOU LOSE", Color.RED, 100),
-                            new Text("Your Score Was", Color.WHITE, 50),
-                            new Text(Integer.toString(NUMS.SCORE), Color.WHITE, 70),
-                            new Text("Press Space to Play Again", Color.BLUE, 40)};
+public class EndScreen extends World {
+    private Actor images[];
     private int[] finalPos = new int[4];        // Positions are relative to last position
     private Music bm;
-    private boolean set = false, added[] = new boolean[4];
+    private boolean set = false, added[] = new boolean[4], lastPress;
     private int act = 0;
     private String typed = "";   // Hidden feature where you can type 'space' to start the game
+    private Person mainCharacter;
     
-    public EndScreen() {
+    public EndScreen(int x) {
         super(NUMS.WORLD_WIDTH, NUMS.WORLD_HEIGHT, 1);
         removeObjects(getObjects(null));
         GreenfootImage image = new GreenfootImage(NUMS.WORLD_WIDTH, NUMS.WORLD_HEIGHT);
@@ -23,22 +19,36 @@ public class EndScreen extends World
         image.fill();
         setBackground(image);
         
+        images = new Actor[] {  new TextImages("EndText1.png", "YOU LOSE".length(), 80),
+                                new TextImages("EndText2.png", "YOR SCORE WAS".length(), 40),
+                                new Text(Integer.toString(NUMS.SCORE), Color.WHITE, 70),
+                                new TextImages("EndText3.png", "PRESS SPACE TO PLAY AGAIN".length(), 20)};
+        
         finalPos[3] = getHeight() * 3 >> 2;
         finalPos[1] = finalPos[3] - (getHeight() >> 1);
-        finalPos[2] = finalPos[1] - txt[1].getHeight();
+        finalPos[2] = finalPos[1] - ((Images) images[1]).getHeight() - 10;
         finalPos[0] = finalPos[3] - (getHeight() >> 2);
         
+        mainCharacter = new Person();
         bm = new Music(new GreenfootSound("DuckTalesMoonTheme.mp3"));
+        bm.loop();
         
-        addObject(txt[3], getWidth() >> 1, 0);
+        addObject(mainCharacter, x, NUMS.WORLD_HEIGHT - (mainCharacter.getHeight() >> 1));
+        addObject(images[3], getWidth() >> 1, 0);
         added[3] = true;
     }
     
     public void act() {     // Maybe slide text into place 
-        bm.loop();
-        bm.play();
-        if (Greenfoot.isKeyDown("m"))
+        if (Greenfoot.isKeyDown("m") && !lastPress) {   // Mute music
             NUMS.MUSIC = !NUMS.MUSIC;
+        }
+        lastPress = Greenfoot.isKeyDown("m");   // Make sure only one keystroke is recorded
+        
+        if (act >= 150 && NUMS.MUSIC) { // Short timer
+            bm.play();
+        } else {
+            bm.pause();
+        }
             
         // Check for user input
         String key = Greenfoot.getKey();
@@ -50,32 +60,30 @@ public class EndScreen extends World
             bm.stop();
             Greenfoot.setWorld(new JumpWorld());
         }
+            
         if (!set) { // Set text slide from top
-            if (txt[3].getY() >= finalPos[2] && !added[2]) {
-                addObject(txt[2], getWidth() >> 1, 0);
-                added[2] = true;
-            } else if (txt[3].getY() >= finalPos[1]&& !added[1]) {
-                addObject(txt[1], getWidth() >> 1, 0);
-                added[1] = true;
-            } else if (txt[3].getY() >= finalPos[0] && !added[0]) {
-                addObject(txt[0], getWidth() >> 1, 0);
-                added[0] = true;
+            for (int i = 2; i >= 0; i--) {
+                if (images[3].getY() >= finalPos[i] && !added[i]) {
+                    addObject(images[i], getWidth() >> 1, 0);
+                    added[i] = true;
+                }
             }
                 
-            if (txt[3].getY() < finalPos[3]) {
+            if (images[3].getY() < finalPos[3]) {
                 for (int i = 0; i < 4; i++) {
                     if (added[i])
-                        txt[i].setLocation(txt[i].getX(), txt[i].getY() +7);
+                        images[i].setLocation(images[i].getX(), images[i].getY() + 7);
                 }
             } else {
                 set = true;
             }
         } else {
+            removeObject(mainCharacter);
             if (act % 30 == 0)  // Blink effect
-                removeObject(txt[3]);
+                removeObject(images[3]);
             else if (act % 30 == 10)
-                addObject(txt[3], getWidth() >> 1, getHeight() * 3 >> 2);   
-            act++;
+                addObject(images[3], getWidth() >> 1, getHeight() * 3 >> 2);   
         }
+        act++;
     }
 }

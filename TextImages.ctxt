@@ -1,0 +1,5 @@
+#BlueJ class context
+comment0.target=TextImages
+comment1.params=image\ length\ size
+comment1.target=TextImages(java.lang.String,\ int,\ int)
+numComments=2

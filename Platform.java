@@ -24,6 +24,14 @@ public class Platform extends Actor {
         fx = new Music(new GreenfootSound("CrackingNoiseFX.mp3"), true);
     }
     
+    public Platform() { // Set image to a rectangle and add it
+        changeColor(NUMS.COLOR_SCHEME);
+        moving = false;
+        timed = false;
+        jumpsLeft = -1;
+        fx = new Music(new GreenfootSound("CrackingNoiseFX.mp3"), true);
+    }
+    
     public void act() {
         if (jumpsLeft == 0) {    // If Platform has no jumps left
             timed = true;        // Start timer
@@ -34,7 +42,8 @@ public class Platform extends Actor {
                 remove();
             else if (timer == 20) {
                 changeColor(Color.RED);
-                fx.play(75);
+                if (NUMS.SFX)
+                    fx.play(75);
             }
         } else if (moving) {    // If platform is moving
             if (getX() > moveAmount + leftBarrier || getX() > NUMS.WORLD_WIDTH && speed > 0)   // If platform is past right side
