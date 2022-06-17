@@ -1,7 +1,6 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 /**
  * Add Super Jumps
- * Button Click Sound
  * 
  * How to Play:
  * - Click Play to start the game
@@ -11,6 +10,7 @@ import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
  * - Use 'm' to mute the SFX and music
  * 
  * Cheats are in NUMS class under the space
+ * Color changes as score changes
  * Cool Stuff happens when you reach 5000 score
  *  - Change NUMS.START_AT_5000 to true
  * 
