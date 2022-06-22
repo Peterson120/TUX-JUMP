@@ -3,7 +3,6 @@ import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 public class WelcomeScreen extends World
 {
     private static Music bm;
-    private boolean lastPress;
     private GreenfootImage bg;
     private Button play, music, sfx;
     private Text main;
@@ -40,12 +39,8 @@ public class WelcomeScreen extends World
     }
 
     public void act() { // Check for key presses
-        if (Greenfoot.isKeyDown("m") && !lastPress) {
-            NUMS.MUSIC = ! NUMS.MUSIC;
-            NUMS.SFX = !NUMS.SFX;
-        } else if (Greenfoot.isKeyDown("Enter") || Greenfoot.isKeyDown("space"))
+        if (Greenfoot.isKeyDown("Enter") || Greenfoot.isKeyDown("space"))
             nextWorld();
-        lastPress = Greenfoot.isKeyDown("m");
         
         if (NUMS.MUSIC) {   // Enable music
             bm.play(75);

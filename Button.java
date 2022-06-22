@@ -4,6 +4,7 @@ public class Button extends Actor {
     private String type; // Store the type of button (New World, Sound, etc)
     private GreenfootImage image;
     private Music fx;
+    private boolean lastPress = false;
     public Button(String type) {
         this.type = type;
         fx = new Music(new GreenfootSound("MouseClickFX.mp3"));
@@ -12,7 +13,7 @@ public class Button extends Actor {
     
     public void act() {
         fx = new Music(new GreenfootSound("MouseClickFX.mp3"));
-        if (Greenfoot.mouseClicked(this)) { // Change music booleans, or go to jumpworld
+        if (Greenfoot.mouseClicked(this) || (Greenfoot.isKeyDown("m") && !lastPress && !type.equals("World"))) { // Change music booleans, or go to jumpworld
             switch (type) {
                 case "World":
                     if (NUMS.SFX)
@@ -36,6 +37,7 @@ public class Button extends Actor {
                     break;
             }
         }
+        lastPress = Greenfoot.isKeyDown("m");
     }
     
     public void changeImage() {

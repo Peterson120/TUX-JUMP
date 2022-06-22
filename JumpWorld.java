@@ -1,13 +1,14 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 /**
- * Add Super Jumps
- * 
  * How to Play:
  * - Click Play to start the game
  * - Use the Arrow keys or AD to move left and right
  * - Try to stay on the platforms and get a high score
  * - Platorms might break so move fast!
+ * - Always have a backup plan!
  * - Use 'm' to mute the SFX and music
+ * - Yellow Platforms give you a jump boost for 10 seconds but be carful, these can still break
+ *      - A Red penguin will appear when you are nearing the end of your powerup
  * 
  * Cheats are in NUMS class under the space
  * Color changes as score changes
@@ -28,6 +29,7 @@ import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
  * Images Used
  *  - Edited Penguin Standing   https://www.dreamstime.com/vector-illustration-cute-baby-penguin-cartoon-sitting-isolated-white-background-cute-baby-penguin-cartoon-sitting-image104296247
  *  - Edited Penguin Sitting    https://www.shutterstock.com/image-vector/vector-illustration-cute-baby-penguin-cartoon-747975076
+ *  - Red Penguin               https://clubpenguin.fandom.com/wiki/Red
  *  - Volume Button             https://www.istockphoto.com/vector/speaker-audio-icon-set-volume-voice-control-on-off-mute-symbol-flat-application-gm1276641059-376092875
  *  - Music Mute Button         https://www.nicepng.com/ourpic/u2e6w7r5e6t4r5t4_muted-music-notes-music-mute-icon-png/
  *  - Music Button              https://www.vectorstock.com/royalty-free-vector/music-button-on-white-vector-10514828
@@ -40,7 +42,7 @@ public class JumpWorld extends World {
     private final static int spawn_buffer = 50, removalRate = 20;
     private int act;
     private double last;
-    private boolean lastPress, infoOn;  // Gets last user keystroke to make sure music is not muted multiple times
+    private boolean infoOn;
     private Text score, info;
     private Person mainCharacter;
     private GreenfootImage image;
@@ -99,6 +101,7 @@ public class JumpWorld extends World {
         gameEnd = false;
         infoOn = true;
         NUMS.SCORE = 0;
+        NUMS.SPACING = 0;
         if (NUMS.START_AT_5000)
             NUMS.SCORE = 5000;
         if (NUMS.MORE_PLATFORMS)
@@ -128,7 +131,7 @@ public class JumpWorld extends World {
         NUMS.INFINITE_JUMPS = true;
         Platform plat = createPlatforms(NUMS.WORLD_WIDTH >> 1, NUMS.WORLD_HEIGHT - 300);
         NUMS.INFINITE_JUMPS = last2;
-        while (plat.getY() >= 0)    // Create random platforms based on initial plat and spacing
+        while (plat.getY() > 0)    // Create random platforms based on initial plat and spacing
             plat = createPlatforms(plat);
         NUMS.EXPLODE = last;
         addObject(info, getWidth() >> 1, getHeight() >> 2);
@@ -141,10 +144,7 @@ public class JumpWorld extends World {
     }
     
     public void act() {
-        if (Greenfoot.isKeyDown("m") && !lastPress) { // Check if M is pressed and that it was not previously pressed
-            NUMS.MUSIC = !NUMS.MUSIC;
-            NUMS.SFX = !NUMS.SFX;
-        } else if (infoOn && (Greenfoot.isKeyDown("left") || Greenfoot.isKeyDown("right") || Greenfoot.isKeyDown("a") || Greenfoot.isKeyDown("d"))) { // Remove info on key press
+        if (infoOn && (Greenfoot.isKeyDown("left") || Greenfoot.isKeyDown("right") || Greenfoot.isKeyDown("a") || Greenfoot.isKeyDown("d"))) { // Remove info on key press
             removeObject(info);
             removeObject(leftKey);
             removeObject(rightKey);
@@ -154,7 +154,6 @@ public class JumpWorld extends World {
             bm.play();
         else
             bm.pause();
-        lastPress = Greenfoot.isKeyDown("m");
         
         if (NUMS.SCORE >= 10000)        // Remove second cheat
             NUMS.EXPLODE = true;
@@ -179,9 +178,10 @@ public class JumpWorld extends World {
     
         score.updateText("Score: " + NUMS.SCORE);
         score.setLocation(NUMS.WORLD_WIDTH - (score.getWidth() >> 1) - 10, score.getY());
-        if (movedAmount > NUMS.SPACING || NUMS.MORE_PLATFORMS) {    // Check is the platforms have moved down more than the max spacing
-            if (NUMS.SPACING < (15 * 15 >> 2))                      // Displacement formula with acceleration
-                NUMS.SPACING+=5;                                    // Increase Platform spacing
+        
+        if (movedAmount > NUMS.SPACING + NUMS.PLATFORM_HEIGHT || NUMS.MORE_PLATFORMS) {    // Check is the platforms have moved down more than the max spacing
+            if (NUMS.SPACING < (-7 * -7))                    // Displacement formula with acceleration to determine max spacing while allowing 2 platforms in the range of one jump: 0 = -(15/2)^2 + 2*(1/2)d
+                NUMS.SPACING ++;                             // Increase Platform spacing
             movedAmount = 0;                                        // Reset
             createPlatforms(random(NUMS.WORLD_WIDTH - NUMS.PLATFORM_WIDTH - (NUMS.PLATFORM_WIDTH >> 1), NUMS.PLATFORM_WIDTH >> 1), NUMS.SCOREBAR_HEIGHT); // Make new platforms
             
@@ -237,7 +237,7 @@ public class JumpWorld extends World {
     }
     
     private Platform createPlatforms(Platform last) {   // Create round platforms everywhere on the screen Randomized x locations
-        return createPlatforms(random(NUMS.WORLD_WIDTH - NUMS.PLATFORM_WIDTH, last.getWidth() >> 1), last.getY() - random(50, NUMS.SPACING));
+        return createPlatforms(random(NUMS.WORLD_WIDTH - NUMS.PLATFORM_WIDTH, last.getWidth() >> 1), last.getY() - random(50, NUMS.SPACING) - NUMS.PLATFORM_HEIGHT);
     }
     
     private Platform createPlatforms(int x, int y) { // Create a rounded platform at (x,y)

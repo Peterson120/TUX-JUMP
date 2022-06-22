@@ -6,16 +6,16 @@ public class Person extends Actor {
     /*
      * Final varibles for the character
      * Side buffer is how much the character can be off the left/right side of the screen
-     * Velocity is the initial jump speed of the character
      * horizontalSpeed is the speed to move horizontally on mouse movement or arrow key presses
      * Gravity is the Downwards Acceleration
      * act keps track of the act number
        */
-    private final int sideBuffer = (getImage().getWidth() >> 2), velocity = -15, horizontalSpeed = 7, gravity = NUMS.FLIGHT ? 0 : 1;
-    private int act = 0;                                                    // Act number
+    private final int sideBuffer = (getImage().getWidth() >> 2), horizontalSpeed = 7, gravity = NUMS.FLIGHT ? 0 : 1;
+    private int act = 0, velocity = -15, flashTimer = 0;                    // Act number and initial velocity of jump
     private double rate;                                                    // Fall velocity of the Human (Vertical movement modifier)
     private boolean down, stopped, allowMovement;                           // Mouse states and if character is falling down
-    private GreenfootImage falling, standing;
+    private long initial = 0;                                               // Powerup timer
+    private GreenfootImage falling, standing, red;                          // Images
     private MouseInfo mouse;
     private Music fx;
     
@@ -27,6 +27,9 @@ public class Person extends Actor {
         
         falling = new GreenfootImage("Sitting.png");
         falling.scale(60, 72);
+        
+        red = new GreenfootImage("RedPenguin.png");
+        red.scale(60,72);
         
         standing = new GreenfootImage("Standing.png");
         standing.scale(60, 72);
@@ -42,6 +45,13 @@ public class Person extends Actor {
         fx = new Music(new GreenfootSound("BoingFX.mp3"), true);    // Reset Sound to allow multiple sounds to play at once
         mouse = Greenfoot.getMouseInfo();
         
+        if((System.nanoTime() - initial) / 1000000000 > 10) // If power up timer is over, set jump back to original
+            velocity = -15; 
+        else if((System.nanoTime() - initial) / 1000000000 > 7) {
+            flash();
+            flashTimer++;
+        }
+            
         if (NUMS.SCORE > 5000) {
             standing.setColor(Color.BLACK);
             falling.setColor(Color.BLACK);
@@ -108,7 +118,22 @@ public class Person extends Actor {
             if (NUMS.SFX)
                 fx.play(100);
         }
+        if (plat != null && plat.isPowerUp()) { // Power up
+            initial = System.nanoTime();
+            velocity = -22;
+        }
         return plat;
+    }
+    
+    private void flash() {
+        if (flashTimer % 40 == 0)
+            setImage(red);
+        else if (flashTimer % 40 == 20) {
+            if (down)
+                setImage(falling);
+            else 
+                setImage(standing);
+        }
     }
     
     public int getHeight() {

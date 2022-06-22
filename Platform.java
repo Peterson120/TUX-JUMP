@@ -1,19 +1,25 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 public class Platform extends Actor {
-    private boolean moving, timed;                        // Boolean to see if the platform should move, if the platform is on a timer, and if the platform is destroyed
+    private boolean moving, timed, powerUp;                        // Boolean to see if the platform should move, if the platform is on a timer, and if the platform is destroyed
     private int leftBarrier, moveAmount, speed, jumpsLeft, timer;   // Determine platform spacing, amount to move, and left barrier and number of jumps left on the platform
     private GreenfootImage image;
     private Music fx;
     
     public Platform(int left) { // Set image to a rectangle and add it
-        changeColor(NUMS.COLOR_SCHEME);
+        powerUp = random(50, 0) == 0; // 1 to 50 chance of spawning platform with power up
         moving = NUMS.SCORE > NUMS.SPAWN_SCORE && random(8, 0) == 0;
+
+        if (powerUp) 
+            changeColor(Color.YELLOW);
+        else 
+            changeColor(NUMS.COLOR_SCHEME);
+        
         if (!moving) {    // Moving platforms cannot explode and have near infinite jumps
             timed = NUMS.EXPLODE ? random(15, 0) == 0 : false;  // Exploding platforms
             jumpsLeft = random(9, 1);
         } else {
             jumpsLeft = -1;
-            left = left > NUMS.WORLD_WIDTH - NUMS.PLATFORM_WIDTH ? left - NUMS.PLATFORM_WIDTH >> 1 : left;
+            left = left > NUMS.WORLD_WIDTH - NUMS.PLATFORM_WIDTH ? left - NUMS.PLATFORM_WIDTH : left;
         }
         if (NUMS.INFINITE_JUMPS)
             jumpsLeft = -1;
@@ -95,5 +101,9 @@ public class Platform extends Actor {
     
     public int getWidth() {
         return getImage().getWidth();
+    }
+    
+    public boolean isPowerUp() {
+        return powerUp;
     }
 }
