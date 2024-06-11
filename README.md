@@ -10,10 +10,10 @@ To use the following commands please make sure git is installed
 <h3>Ubuntu</h3>
 Run this to create a directory in your Home folder. Then change to that directory.
 
-    sudo cd ~ && mkdir Checkers && cd Checkers
+    sudo cd ~ && mkdir TUXJUMP && cd TUXJUMP
 Run this to clone the git project to your folder
 
-    git clone https://github.com/Peterson120/Checkers
+    git clone https://github.com/Peterson120/TUXJUMP
 
 <h3>Windows</h3>
 Open command prompt as administrator.
@@ -23,7 +23,7 @@ Change to home Directory
     cd C:\User\%user%\
 Make Folder and Change Directory
     
-    mkdir Checkers && cd Checkers
+    mkdir TUXJUMP && cd TUXJUMP
 Clone repository
 
-    git clone https://github.com/Peterson120/Checkers
+    git clone https://github.com/Peterson120/TUXJUMP
